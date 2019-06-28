@@ -50,9 +50,10 @@ namespace Duplicat.IntegrationTests
             };
 
 
-            var results = LocalDuplicateFinder.Find(path: samples.DirectoryPath, pattern: samples.FilePattern, recurse: true);
+            var isSuccess = LocalDuplicateFinder.TryFind(directoryPath: samples.DirectoryPath, recurse: true, out var results, out var errors);
 
-
+            Assert.True(isSuccess);
+            Assert.Null(errors);
             Assert.Equal(expected, results);
         }
 
@@ -60,9 +61,13 @@ namespace Duplicat.IntegrationTests
         [InlineData("\023")]
         [InlineData("\0")]
         [InlineData("?")]
-        public void Should_throw_for_invalid_directory_paths(string directoryPath)
+        public void Should_return_errors_for_invalid_directory_paths(string directoryPath)
         {
-            Assert.Throws<ArgumentException>(() => LocalDuplicateFinder.Find(directoryPath, "*.*", recurse: false));
+            var isSuccess = LocalDuplicateFinder.TryFind(directoryPath, recurse: false, out var results, out var errors);
+
+            Assert.False(isSuccess);
+            Assert.Null(results);
+            Assert.NotEmpty(errors);
         }
 
         [Theory]
@@ -70,9 +75,13 @@ namespace Duplicat.IntegrationTests
         [InlineData(" ")]
         [InlineData("\n")]
         [InlineData(null)]
-        public void Should_throw_for_empty_directory_paths(string directoryPath)
+        public void Should_return_errors_for_empty_directory_paths(string directoryPath)
         {
-            Assert.Throws<ArgumentNullException>(() => LocalDuplicateFinder.Find(directoryPath, "*.*", recurse: false));
+            var isSuccess = LocalDuplicateFinder.TryFind(directoryPath, recurse: false, out var results, out var errors);
+
+            Assert.False(isSuccess);
+            Assert.Null(results);
+            Assert.NotEmpty(errors);
         }
 
 
@@ -91,7 +100,6 @@ namespace Duplicat.IntegrationTests
             }
 
             public string DirectoryPath { get; }
-            public string FilePattern { get; } = "*.*";
 
             public static TemporarySampleFiles Create(byte[][] contents)
             {

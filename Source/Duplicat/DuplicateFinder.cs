@@ -19,6 +19,7 @@ namespace Duplicat
             group file by file.Size into sizeDuplicates // TODO: https://stackoverflow.com/a/3433635
             where sizeDuplicates.Count() > 1
             from contentDuplicates in GetContentDuplicates(sizeDuplicates.Select(f => f.Path))
+            where contentDuplicates.Count() > 1
             select contentDuplicates;
 
 
@@ -33,7 +34,7 @@ namespace Duplicat
                 .ToLookup(f => StreamComparison(files.First(), f));
 
             //return GetContentDuplicates(matchesFirst.Single(f => f.Key == false)).Prepend(matchesFirst.Single(f => f.Key == true));
-            return GetContentDuplicates(matchesFirst[false]).Prepend(matchesFirst[true]);
+            return GetContentDuplicates(matchesFirst[false]).Prepend(matchesFirst[true]); // TODO: Find a non-recursive solution
         }
 
 
