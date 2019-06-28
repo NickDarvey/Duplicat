@@ -2,11 +2,8 @@
 using FsCheck.Xunit;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.IO;
 using System.Linq;
-using System.Text;
-using Xunit;
 
 namespace Duplicat.UnitTests
 {
@@ -15,14 +12,14 @@ namespace Duplicat.UnitTests
         [Property]
         public Property Returned_groups_are_not_empty(Dictionary<string, byte[]> files) =>
             new DuplicateFinder(CreateFileOpener(files))
-                .Find(files.Select(f => (f.Key, f.Value.Length)))
+                .Find(CreateFileSummaries(files))
                 .All(group => group.Any())
                 .ToProperty();
 
         [Property]
         public Property Returned_groups_where_all_elements_have_equal_content(Dictionary<string, byte[]> files) =>
             new DuplicateFinder(CreateFileOpener(files))
-                .Find(files.Select(f => (f.Key, f.Value.Length)))
+                .Find(CreateFileSummaries(files))
                 .All(group => group.Select(path => files[path]).Distinct(ByteArrayEqualityComparer.Instance).Count() <= 1)
                 .ToProperty();
 
@@ -47,6 +44,9 @@ namespace Duplicat.UnitTests
 
         private static Func<string, Stream> CreateFileOpener(IReadOnlyDictionary<string, byte[]> files) =>
             path => new MemoryStream(files[path]);
+
+        private static IEnumerable<(string Path, long Size)> CreateFileSummaries(Dictionary<string, byte[]> files) =>
+            files.Select(f => (f.Key, (long)f.Value.Length));
 
         #endregion
     }

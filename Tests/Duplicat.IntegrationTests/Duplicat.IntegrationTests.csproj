@@ -1,14 +1,10 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
-  <Import Project="..\Tests.props"/>
-  
+  <Import Project="..\Tests.props" />
+
   <PropertyGroup>
     <TargetFramework>netcoreapp3.0</TargetFramework>
   </PropertyGroup>
-
-  <ItemGroup>
-    <PackageReference Include="FsCheck.Xunit" Version="2.14.0" />
-  </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\..\Source\Duplicat\Duplicat.csproj" />

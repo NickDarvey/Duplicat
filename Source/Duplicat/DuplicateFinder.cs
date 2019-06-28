@@ -14,9 +14,9 @@ namespace Duplicat
 
         // what about zero length files?
 
-        public IEnumerable<IEnumerable<string>> Find(IEnumerable<(string Path, int Size)> files) =>
+        public IEnumerable<IEnumerable<string>> Find(IEnumerable<(string Path, long Size)> files) =>
             from file in files
-            group file by file.Size into sizeDuplicates
+            group file by file.Size into sizeDuplicates // TODO: https://stackoverflow.com/a/3433635
             where sizeDuplicates.Count() > 1
             from contentDuplicates in GetContentDuplicates(sizeDuplicates.Select(f => f.Path))
             select contentDuplicates;
@@ -39,11 +39,9 @@ namespace Duplicat
 
         private bool StreamComparison(string filePath1, string filePath2)
         {
-            using (var stream1 = _openFile(filePath1))
-            using (var stream2 = _openFile(filePath2))
-            {
-                return stream1.AsEnumerable().SequenceEqual(stream2.AsEnumerable());
-            }
+            using var stream1 = _openFile(filePath1);
+            using var stream2 = _openFile(filePath2);
+            return stream1.AsEnumerable().SequenceEqual(stream2.AsEnumerable());
         }
 
         
