@@ -2,13 +2,11 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Security.Cryptography;
 
 namespace Duplicat
 {
     public class DuplicateFinder
     {
-        private static readonly HashAlgorithm _hashAlgorithm = MD5.Create();
         private readonly Func<string, Stream> _openFile;
 
         public DuplicateFinder(Func<string, Stream> openFile) =>
@@ -44,10 +42,10 @@ namespace Duplicat
             using (var stream1 = _openFile(filePath1))
             using (var stream2 = _openFile(filePath2))
             {
-                var hash1 = _hashAlgorithm.ComputeHash(stream1);
-                var hash2 = _hashAlgorithm.ComputeHash(stream2);
-                return hash1.SequenceEqual(hash2);
+                return stream1.AsEnumerable().SequenceEqual(stream2.AsEnumerable());
             }
         }
+
+        
     }
 }
