@@ -16,7 +16,7 @@ namespace Duplicat
             from file in files
             group file by file.Size into sizeDuplicates
             where sizeDuplicates.Count() > 1
-            from contentDuplicates in GetContentDuplicates(sizeDuplicates.Select(f => f.Path))
+            from contentDuplicates in GetContentDuplicates2(sizeDuplicates.Select(f => f.Path))
             where contentDuplicates.Count() > 1
             select contentDuplicates;
 
@@ -31,6 +31,16 @@ namespace Duplicat
 
             // TODO: Implement a non-recursive solution 'coz stack overflow.
             return GetContentDuplicates(matchesFirst[false]).Prepend(matchesFirst[true]); 
+        }
+
+        private IEnumerable<IEnumerable<string>> GetContentDuplicates2(IEnumerable<string> files, IEnumerable<IEnumerable<string>> accumulated = null)
+        {
+            if(accumulated == null) accumulated = Enumerable.Empty<IEnumerable<string>>();
+            if (files.Any() == false) return accumulated;
+
+            var matchesFirst = files.ToLookup(f => StreamComparison(files.First(), f));
+
+            return GetContentDuplicates2(matchesFirst[false], accumulated.Prepend(matchesFirst[true]));
         }
 
         private bool StreamComparison(string filePath1, string filePath2)
