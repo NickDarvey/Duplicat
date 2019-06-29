@@ -9,6 +9,7 @@ namespace Duplicat.PowerShell
         [Parameter(
             Mandatory = true,
             Position = 0,
+            HelpMessage = "The path to the directory in which to search for duplicates.",
             ValueFromPipeline = true,
             ValueFromPipelineByPropertyName = true)]
         public string[] Path { get; set; }
