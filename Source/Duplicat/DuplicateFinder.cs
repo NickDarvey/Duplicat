@@ -16,31 +16,23 @@ namespace Duplicat
             from file in files
             group file by file.Size into sizeDuplicates
             where sizeDuplicates.Count() > 1
-            from contentDuplicates in GetContentDuplicates2(sizeDuplicates.Select(f => f.Path))
+            from contentDuplicates in GetContentDuplicates(sizeDuplicates.Select(f => f.Path))
             where contentDuplicates.Count() > 1
             select contentDuplicates;
 
         private IEnumerable<IEnumerable<string>> GetContentDuplicates(IEnumerable<string> files)
         {
-            // End recursion when we have no more files left.
-            if (files.Any() == false) return Enumerable.Empty<IEnumerable<string>>();
+            var accumulated = Enumerable.Empty<IEnumerable<string>>();
+            while (files.Any() != false)
+            {
+                // Split into those that match against the first element, and those that don't.
+                // TODO: Cache streams; don't first stream against itself.
+                var matchesFirst = files.ToLookup(f => StreamComparison(files.First(), f));
 
-            // Split into those that match against the first element, and those that don't.
-            // TODO: Cache streams; don't first stream against itself.
-            var matchesFirst = files.ToLookup(f => StreamComparison(files.First(), f));
-
-            // TODO: Implement a non-recursive solution 'coz stack overflow.
-            return GetContentDuplicates(matchesFirst[false]).Prepend(matchesFirst[true]); 
-        }
-
-        private IEnumerable<IEnumerable<string>> GetContentDuplicates2(IEnumerable<string> files, IEnumerable<IEnumerable<string>> accumulated = null)
-        {
-            if(accumulated == null) accumulated = Enumerable.Empty<IEnumerable<string>>();
-            if (files.Any() == false) return accumulated;
-
-            var matchesFirst = files.ToLookup(f => StreamComparison(files.First(), f));
-
-            return GetContentDuplicates2(matchesFirst[false], accumulated.Prepend(matchesFirst[true]));
+                files = matchesFirst[false];
+                accumulated = accumulated.Prepend(matchesFirst[true]);
+            }
+            return accumulated;
         }
 
         private bool StreamComparison(string filePath1, string filePath2)

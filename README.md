@@ -1,4 +1,12 @@
 # Duplicat
+<div align="center">
+<pre>
+ \    /\  \    /\
+  )  ( ')  )  ( ')
+ (  /  )  (  /  )
+  \(__)|   \(__)|
+</pre>
+</div>
 
 ## Prerequisites
 
@@ -62,6 +70,5 @@ Tests are split into unit and integration tests. You can run the tests with `dot
 **Duplicat.IntegrationTests** validates the behaviour of the algorithm against the real file system.
 
 ## TODO
-* Implement a non-recursive solution `GetContentDuplicates` 
-* Cache stream values per `sizeDuplicate` batch.
-* Handle permission denied on individual files (perhaps just skip them).
+* [Performance] Cache stream values per `sizeDuplicate` batch
+* Handle permission denied on individual files, e.g. https://stackoverflow.com/a/13130054
