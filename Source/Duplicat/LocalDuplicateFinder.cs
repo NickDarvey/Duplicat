@@ -38,7 +38,7 @@ namespace Duplicat
             }
 
             var files = new DirectoryInfo(directoryPath)
-                .EnumerateFiles("*", new EnumerationOptions { RecurseSubdirectories = recurse })
+                .EnumerateFiles("*", recurse ? SearchOption.AllDirectories : SearchOption.TopDirectoryOnly)
                 .Select(f => (f.FullName, f.Length));
 
             results = _finder.Find(files);

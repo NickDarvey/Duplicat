@@ -34,9 +34,11 @@ namespace Duplicat
 
         private bool StreamComparison(string filePath1, string filePath2)
         {
-            using var stream1 = _openFile(filePath1);
-            using var stream2 = _openFile(filePath2);
-            return stream1.AsEnumerable().SequenceEqual(stream2.AsEnumerable());
-        }    
+            using (var stream1 = _openFile(filePath1))
+            using (var stream2 = _openFile(filePath2))
+            {
+                return stream1.AsEnumerable().SequenceEqual(stream2.AsEnumerable());
+            }
+        }
     }
 }
