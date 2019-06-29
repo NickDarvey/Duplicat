@@ -18,11 +18,18 @@ namespace Duplicat.Cli
                 description: "The path to the directory in which to search for duplicates.",
                 CommandOptionType.SingleValue);
 
+            var recurseOption = app.Option(
+                template: "-r|--recurse",
+                description: "Included, will search subdirectories. Excluded, will search top-level directory only.",
+                CommandOptionType.NoValue);
+
             app.OnExecute(() =>
             {
                 if (pathOption.HasValue())
                 {
-                    var isSuccess = LocalDuplicateFinder.TryFind(pathOption.Value(), true, out var results, out var errors);
+                    var isSuccess = LocalDuplicateFinder.TryFind(
+                        directoryPath: pathOption.Value(),
+                        recurse: recurseOption.HasValue(), out var results, out var errors);
 
                     if (isSuccess)
                     {
