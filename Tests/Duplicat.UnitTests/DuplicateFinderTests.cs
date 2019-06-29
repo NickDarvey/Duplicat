@@ -10,10 +10,10 @@ namespace Duplicat.UnitTests
     public class DuplicateFinderTests
     {
         [Property]
-        public Property Returned_groups_are_not_empty(Dictionary<string, byte[]> files) =>
+        public Property Returned_groups_contain_more_than_one_element(Dictionary<string, byte[]> files) =>
             new DuplicateFinder(CreateFileOpener(files))
                 .Find(CreateFileSummaries(files))
-                .All(group => group.Any())
+                .All(group => group.Count() > 1)
                 .ToProperty();
 
         [Property]
