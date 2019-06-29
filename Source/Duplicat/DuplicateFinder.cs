@@ -14,22 +14,23 @@ namespace Duplicat
 
         public IEnumerable<IEnumerable<string>> Find(IEnumerable<(string Path, long Size)> files) =>
             from file in files
-            group file by file.Size into sizeDuplicates // TODO: https://stackoverflow.com/a/3433635
+            group file by file.Size into sizeDuplicates
             where sizeDuplicates.Count() > 1
             from contentDuplicates in GetContentDuplicates(sizeDuplicates.Select(f => f.Path))
             where contentDuplicates.Count() > 1
             select contentDuplicates;
 
-
         private IEnumerable<IEnumerable<string>> GetContentDuplicates(IEnumerable<string> files)
         {
+            // End recursion when we have no more files left.
             if (files.Any() == false) return Enumerable.Empty<IEnumerable<string>>();
 
             // Split into those that match against the first element, and those that don't.
-            var matchesFirst = files // TODO: Cache first, don't compare against self
-                .ToLookup(f => StreamComparison(files.First(), f));
+            // TODO: Cache streams; don't first stream against itself.
+            var matchesFirst = files.ToLookup(f => StreamComparison(files.First(), f));
 
-            return GetContentDuplicates(matchesFirst[false]).Prepend(matchesFirst[true]); // TODO: Find a non-recursive solution
+            // TODO: Implement a non-recursive solution 'coz stack overflow.
+            return GetContentDuplicates(matchesFirst[false]).Prepend(matchesFirst[true]); 
         }
 
         private bool StreamComparison(string filePath1, string filePath2)

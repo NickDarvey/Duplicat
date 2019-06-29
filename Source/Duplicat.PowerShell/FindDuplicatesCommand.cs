@@ -14,7 +14,9 @@ namespace Duplicat.PowerShell
             ValueFromPipelineByPropertyName = true)]
         public string[] Path { get; set; }
 
-        [Parameter(Position = 1)]
+        [Parameter(
+            Position = 1,
+            HelpMessage = "Included, will search subdirectories. Excluded, will search top-level directory only.")]
         public SwitchParameter Recurse { get; set; } = false;
 
         protected override void ProcessRecord()
