@@ -12,6 +12,18 @@ namespace Duplicat
         public DuplicateFinder(Func<string, Stream> openFile) =>
             _openFile = openFile;
 
+        /// <summary>
+        /// Finds duplicates in a stream of files.
+        /// </summary>
+        /// <remarks>
+        /// It first groups files by their size because only files of the same size
+        /// could have the same contents.
+        /// Then it checks the actual contents of potential matches, reading byte-by-byte
+        /// because if we find a difference we can abandon without having read the whole
+        /// file into memory (unlike a hashing-based solution).
+        /// </remarks>
+        /// <param name="files">Path and file size pairs.</param>
+        /// <returns>Groups of paths.</returns>
         public IEnumerable<IEnumerable<string>> Find(IEnumerable<(string Path, long Size)> files) =>
             from file in files
             group file by file.Size into sizeDuplicates
